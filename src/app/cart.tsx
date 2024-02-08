@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Text, View, ScrollView, Alert, Linking } from "react-native";
+import {
+  Text,
+  View,
+  ScrollView,
+  Alert,
+  Linking,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Header } from "@/components/header";
 import { Product } from "@/components/product";
@@ -10,6 +18,7 @@ import { Button } from "@/components/button";
 import { Feather } from "@expo/vector-icons";
 import { LinkButton } from "@/components/link-button";
 import { useNavigation } from "expo-router";
+import colors from "tailwindcss/colors";
 
 const PHONE_NUMBER = "558599999999";
 
@@ -62,17 +71,44 @@ export default function Cart() {
       <Header title="Seu Carrinho" />
       <KeyboardAwareScrollView>
         <ScrollView>
-          <View className="p-5 flex-1">
+          <View className="flex-1 p-5">
             {cartStore.products.length > 0 ? (
-              <View className="border-b border-slate-700">
-                {cartStore.products.map((product) => (
-                  <Product
-                    key={product.id}
-                    data={product}
-                    onPress={() => handleProductRemove(product)}
-                  />
-                ))}
-              </View>
+              <FlatList
+                data={cartStore.products}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <View>
+                    <Product data={item} />
+                    <View className="flex-row items-center w-auto m-2 ml-auto">
+                      <TouchableOpacity
+                        className="w-8 h-4 items-center justify-center"
+                        onPress={() => cartStore.remove(item.id)}
+                      >
+                        <Feather
+                          name="minus"
+                          size={16}
+                          color={colors.slate[300]}
+                        />
+                      </TouchableOpacity>
+                      <Text className="text-slate-400 text-xs font-subtitle mr-4 text-center mx-auto">
+                        {item.quantity}
+                      </Text>
+                      <TouchableOpacity
+                        className="w-8 h-4 items-center justify-center"
+                        onPress={() => cartStore.add(item)}
+                      >
+                        <Feather
+                          name="plus"
+                          size={16}
+                          color={colors.slate[300]}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+                showsVerticalScrollIndicator={false}
+                className="border-b border-slate-700"
+              />
             ) : (
               <Text className="font-body text-slate-400 text-center my-8">
                 Seu carrinho está vazio.
